@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jarvis Carry · delta-neutral funding capture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#e8eef7;--muted:#8a99b5;--dim:#5d6b86;--line:rgba(148,163,184,.13)}
+body{margin:0;background:#070b16;color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 500px at 16% -8%,rgba(56,189,248,.10),transparent 60%),radial-gradient(820px 480px at 88% 4%,rgba(168,85,247,.12),transparent 62%),linear-gradient(rgba(148,163,184,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.035) 1px,transparent 1px);
+  background-size:auto,auto,44px 44px,44px 44px;background-attachment:fixed}
+.wrap{max-width:1000px;margin:0 auto;padding:30px 18px 70px}
+.top{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.wm{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:25px;color:#fff;letter-spacing:-.6px}
+.tsub{color:var(--muted);font-size:13px}
+.upd{margin-left:auto;color:var(--dim);font-size:12px;font-family:'IBM Plex Mono',monospace}
+.back{display:inline-block;margin:16px 0 0;color:var(--muted);font-size:12.5px;text-decoration:none}
+.back:hover{color:#38bdf8}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:18px}
+.stat{background:rgba(148,163,184,.05);border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.stat-l{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.stat-v{font-size:22px;font-weight:700;margin-top:5px;font-family:'IBM Plex Mono',monospace;letter-spacing:-.4px}
+.card{margin-top:18px;background:linear-gradient(180deg,rgba(22,32,53,.55),rgba(15,23,42,.5));border:1px solid var(--line);border-radius:15px;padding:18px 18px 12px;backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.34)}
+.card-h{font-size:11px;letter-spacing:2.2px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:12px}
+.chart-box{position:relative;height:280px}
+.pos-row{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.pos-row:last-child{border-bottom:none}
+.pos-coin{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:17px;color:#fff;min-width:60px}
+.pos-detail{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px}
+.pos-label{color:var(--dim)}
+.pos-val{color:#cdd8ec;font-weight:600}
+.no-pos{color:var(--muted);font-size:13px;padding:10px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--dim);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;padding:4px 8px 8px}
+td{padding:8px 8px;border-bottom:1px solid rgba(148,163,184,.06);color:#cdd8ec}
+.coin-name{font-family:'IBM Plex Mono',monospace;font-weight:700;color:#fff}
+.exit-reason{color:var(--dim);font-size:11px;max-width:200px}
+.top-family td{background:rgba(168,85,247,.06)}
+.bias-bar{width:80px;height:8px;background:rgba(148,163,184,.1);border-radius:4px;overflow:hidden}
+.bias-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#a855f7);border-radius:4px}
+.fam-name{font-weight:600;color:#fff}
+.l5-note{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:9px;padding:10px 13px}
+.l5-note b{color:#d8b4fe}
+.regime-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.8px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25)}
+@media(max-width:560px){.chart-box{height:220px}table{font-size:11px}}
+</style></head>
+<body><div class="wrap">
+  <div class="top">
+    <svg width="32" height="32" viewBox="0 0 28 28" style="border-radius:7px;box-shadow:0 0 0 1px rgba(148,163,184,.18)"><defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b4079"/><stop offset="1" stop-color="#0e1a35"/></linearGradient></defs><rect width="28" height="28" rx="7" fill="url(#cg)"/><path d="M14 5.4 Q14 14 22.6 14 Q14 14 14 22.6 Q14 14 5.4 14 Q14 14 14 5.4 Z" fill="#fff"/></svg>
+    <span class="wm">Jarvis Carry</span><span class="tsub">· delta-neutral funding capture</span>
+    <span class="upd">updated 2026-06-01 14:59 SGT</span>
+  </div>
+  <a class="back" href="https://adamdegoat.github.io/jarvis/">← back to Jarvis</a>
+
+  <div class="grid">
+    <div class="stat"><div class="stat-l">Equity</div><div class="stat-v">$10,000.00</div></div>
+    <div class="stat"><div class="stat-l">Total return</div><div class="stat-v" style="color:#e8eef7">+0.000%</div></div>
+    <div class="stat"><div class="stat-l">Carry collected</div><div class="stat-v" style="color:#22c55e">$0.00</div></div>
+    <div class="stat"><div class="stat-l">Open positions</div><div class="stat-v">0</div></div>
+    <div class="stat"><div class="stat-l">BTC regime</div><div class="stat-v" style="color:#f43f5e">BEAR</div></div>
+    <div class="stat"><div class="stat-l">Reflections</div><div class="stat-v">0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">◇ Equity curve — % return from $10k start</div>
+    <div class="chart-box"><canvas id="eq"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">◇ Open positions</div>
+    <div class="no-pos">No open positions — scanning for entry signals every 8h</div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">◇ Live funding rates — full universe</div>
+    <table class="rates-tbl"><thead><tr><th>Coin</th><th>Rate /8h</th><th>Ann. rate</th><th>Mark price</th></tr></thead><tbody><tr><td class="coin-name">ETH</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$1,987.15</td></tr><tr><td class="coin-name">BNB</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$693.50</td></tr><tr><td class="coin-name">XRP</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$1.31</td></tr><tr><td class="coin-name">DOGE</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$0.10</td></tr><tr><td class="coin-name">AVAX</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$8.84</td></tr><tr><td class="coin-name">LINK</td><td style="color:#e8eef7">0.0100%</td><td style="color:#e8eef7">11.0%</td><td>$9.01</td></tr><tr><td class="coin-name">SOL</td><td style="color:#e8eef7">0.0074%</td><td style="color:#e8eef7">8.2%</td><td>$81.40</td></tr><tr><td class="coin-name">SUI</td><td style="color:#e8eef7">0.0008%</td><td style="color:#e8eef7">0.9%</td><td>$0.88</td></tr><tr><td class="coin-name">BTC</td><td style="color:#e8eef7">0.0007%</td><td style="color:#e8eef7">0.7%</td><td>$73,104.70</td></tr><tr><td class="coin-name">NEAR</td><td style="color:#e8eef7">-0.0200%</td><td style="color:#e8eef7">-21.9%</td><td>$2.32</td></tr></tbody></table>
+  </div>
+
+  <div class="card">
+    <div class="card-h">◇ L5 — strategy family scoreboard</div>
+    <table class="fam-tbl">
+      <thead><tr><th>Family</th><th>Sharpe</th><th>Carry/yr</th><th>Gauntlet</th><th>Bias</th></tr></thead>
+      <tbody><tr >
+          <td class="fam-name">A threshold</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>0/1</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr><tr >
+          <td class="fam-name">B momentum</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>—</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr><tr >
+          <td class="fam-name">C regime gated</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>0/1</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr><tr >
+          <td class="fam-name">D oi filtered</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>0/1</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr><tr >
+          <td class="fam-name">E rotation</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>—</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr><tr >
+          <td class="fam-name">F liq filtered</td>
+          <td>—</td>
+          <td style="color:#e8eef7">—</td>
+          <td>—</td>
+          <td class="bias-bar"><div class="bias-fill" style="width:50%"></div></td>
+        </tr></tbody>
+    </table>
+    <div class="l5-note">
+      <b>Top family:</b> — &nbsp;·&nbsp;
+      <b>Active strategy:</b> A_threshold_v1 (A_threshold)<br>
+      <b>Invention bias:</b> No bias yet — equal probability across all families. Run first reflection to set direction.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">◇ Closed positions</div>
+    <div class="no-pos">No closed positions yet.</div>
+  </div>
+
+  <div class="card" style="font-size:13px;color:var(--muted);line-height:1.7">
+    <div class="card-h">◇ How it works</div>
+    <p><b style="color:#cdd8ec">What is funding rate capture?</b> On OKX perpetual futures, every 8 hours longs pay shorts (or vice versa) a <em>funding rate</em>. When retail is euphoric and leveraged long, funding goes positive — they pay us. Jarvis Carry shorts the perpetual and longs an equal amount of spot, collecting this payment while remaining price-neutral.</p>
+    <p><b style="color:#cdd8ec">L5 self-improvement.</b> The system invents new strategy variants, validates each through a historical gauntlet (Sharpe ≥ 1.5, MaxDD ≤ 15%), and tracks which <em>families</em> of approach produce durable income. Each weekly reflection biases the invention engine toward better-performing families — learning how to learn.</p>
+    <p style="color:var(--dim);font-size:11.5px">Paper trading only · not financial advice · runs autonomously every 8h</p>
+  </div>
+
+</div>
+<script>
+const LABELS = ["2026-06-01"];
+const VALUES = [0.0];
+Chart.defaults.color='#8a99b5';
+Chart.defaults.font.family="'IBM Plex Mono',monospace";
+new Chart(document.getElementById('eq'),{
+  type:'line',data:{labels:LABELS,datasets:[{
+    label:'Jarvis Carry',data:VALUES,
+    borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.08)',
+    borderWidth:2,tension:0.25,pointRadius:0,pointHoverRadius:4,fill:true
+  }]},
+  options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#0d1526',borderColor:'rgba(148,163,184,.25)',borderWidth:1,padding:10,
+      callbacks:{label:function(c){return (c.parsed.y>=0?'+':'')+Number(c.parsed.y).toFixed(3)+'%';}}}} ,
+    scales:{
+      x:{grid:{color:'rgba(148,163,184,.06)'},ticks:{maxTicksLimit:6,font:{size:10}}},
+      y:{grid:{color:'rgba(148,163,184,.06)'},ticks:{callback:function(v){return (v>=0?'+':'')+Number(v).toFixed(2)+'%';},font:{size:10}}}
+    }
+  }
+});
+</script>
+</body></html>
